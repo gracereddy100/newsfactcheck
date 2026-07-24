@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI News Fact Checker</title>
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="hero">
+
+        <h1>AI News Fact Checker</h1>
+
+        <p>
+            Verify news credibility using AI,
+            Serper Search and NewsAPI
+        </p>
+
+    </div>
+
+    <form method="POST" class="input-card">
+
+        <textarea
+            name="article"
+            placeholder="Paste news article here..."
+            required></textarea>
+
+        <button type="submit">
+            Analyze Article
+        </button>
+
+    </form>
+
+    {% if report %}
+
+    <div class="report-card">
+
+        <div class="score-section">
+
+            <h2>{{ report.score }}%</h2>
+
+            <span>{{ report.verdict }}</span>
+
+        </div>
+
+        <div class="stats">
+
+            <div class="box">
+                <h3>Verified</h3>
+                <p>{{ report.verified }}</p>
+            </div>
+
+            <div class="box">
+                <h3>Unsupported</h3>
+                <p>{{ report.unsupported }}</p>
+            </div>
+
+        </div>
+
+        <h2>Unsupported Claims</h2>
+
+        {% for claim in report.claims %}
+
+        <div class="claim">
+            {{ claim }}
+        </div>
+
+        {% endfor %}
+
+        <h2>Detailed Report</h2>
+
+        <pre>{{ report.report }}</pre>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
