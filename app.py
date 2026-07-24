@@ -201,20 +201,28 @@ Article:
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-
     report = None
 
-    if request.method == "POST":
+    try:
+        if request.method == "POST":
+            print("POST request received")
 
-        article = request.form["article"]
+            article = request.form["article"]
 
-        report = analyze_news(article)
+            print("Article received")
+
+            report = analyze_news(article)
+
+            print("Analysis completed")
+
+    except Exception as e:
+        print("ERROR:", str(e))
+        return f"ERROR: {str(e)}"
 
     return render_template(
         "index.html",
         report=report
     )
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0",port=8000,debug=True
