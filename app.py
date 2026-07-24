@@ -103,29 +103,102 @@ def analyze_news(news_article):
             {
                 "role": "user",
                 "content": f"""
-Read this news article and give:
+Extract factual claims from the article.
 
-1. Credibility Score (0-100)
-2. Verdict
-3. Short Explanation
+Return ONLY JSON.
+
+Example:
+["claim1","claim2"]
 
 Article:
-{news_article[:1000]}
+{news_article}
 """
             }
         ]
     )
 
-    result = response.choices[0].message.content
+    claims_text = response.choices[0].message.content
+
+    json_match = re.findall(r'\[.*?\]', claims_text, re.DOTALL)
+
+    if json_match:
+        cleaned_claims_text = json_match[-1]
+    else:
+        cleaned_claims_text = claims_text
+
+    try:
+        claims = json.loads(cleaned_claims_text)
+    except:
+        claims = []
+
+    results = []
+
+    for claim in claims:
+
+        verification = verify_claim(claim)
+
+        results.append({
+            "claim": claim,
+            "verification": verification
+        })
+
+    supported = 0
+    unsupported_claims = []
+    report_text = ""
+
+    for item in results:
+
+        report_text += f"\nClaim: {item['claim']}\n"
+        report_text += item["verification"]
+        report_text += "\n\n"
+
+        text = item["verification"].lower()
+
+        if "status: supported" in text:
+            supported += 1
+
+        if (
+            "unsupported" in text
+            or "partially supported" in text
+            or "partially-supported" in text
+            or "not supported" in text
+        ):
+            unsupported_claims.append(item["claim"])
+
+    if len(results) == 0:
+        return {
+            "score": 0,
+            "verdict": "No Claims Found",
+            "verified": 0,
+            "unsupported": 0,
+            "claims": [],
+            "report": "No factual claims found."
+        }
+
+    credibility_score = round(
+        (supported / len(results)) * 100,
+        2
+    )
+
+    if credibility_score >= 80:
+        verdict = "Highly Credible"
+    elif credibility_score >= 60:
+        verdict = "Mostly Reliable"
+    elif credibility_score >= 40:
+        verdict = "Needs Verification"
+    else:
+        verdict = "Potentially Misleading"
 
     return {
-        "score": 0,
-        "verdict": "Analysis Complete",
-        "verified": 0,
-        "unsupported": 0,
-        "claims": [],
-        "report": result
+        "score": credibility_score,
+        "verdict": verdict,
+        "verified": supported,
+        "unsupported": len(unsupported_claims),
+        "claims": unsupported_claims,
+        "report": report_text
     }
+
+
 
     # rest of your code below
 
