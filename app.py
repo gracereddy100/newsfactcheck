@@ -97,13 +97,34 @@ Reason: short explanation
 
 def analyze_news(news_article):
 
+    response = client.chat.completions.create(
+        model="meta-llama/llama-3.1-8b-instruct",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
+Read this news article and give:
+
+1. Credibility Score (0-100)
+2. Verdict
+3. Short Explanation
+
+Article:
+{news_article[:1000]}
+"""
+            }
+        ]
+    )
+
+    result = response.choices[0].message.content
+
     return {
-        "score": 100,
-        "verdict": "TEST",
-        "verified": 1,
+        "score": 0,
+        "verdict": "Analysis Complete",
+        "verified": 0,
         "unsupported": 0,
         "claims": [],
-        "report": "TEST SUCCESS"
+        "report": result
     }
 
     # rest of your code below
