@@ -205,9 +205,8 @@ def home():
     report = None
 
     if request.method == "POST":
-
-        article = request.form["article"]
-
+    article = request.form["article"]
+    return "TEST SUCCESS"
         try:
             report = analyze_news(article)
 
