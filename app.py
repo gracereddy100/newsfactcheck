@@ -148,21 +148,30 @@ Article:
 
     for item in results:
 
-        report_text += f"\nClaim: {item['claim']}\n"
-        report_text += item["verification"]
-        report_text += "\n\n"
+    report_text += f"\nClaim: {item['claim']}\n"
+    report_text += item["verification"]
+    report_text += "\n\n"
 
-        text = item["verification"].lower()
+    print("\nCLAIM:", item["claim"])
+    print(item["verification"])
 
-        if "status: supported" in text:
+    text = item["verification"].lower()
+
+    status_match = re.search(
+        r"status\s*:\s*(supported|partially supported|unsupported)",
+        text
+    )
+
+    if status_match:
+
+        status = status_match.group(1)
+
+        print("Detected Status:", status)
+
+        if status == "supported":
             supported += 1
 
-        if (
-            "unsupported" in text
-            or "partially supported" in text
-            or "partially-supported" in text
-            or "not supported" in text
-        ):
+        if status in ["unsupported", "partially supported"]:
             unsupported_claims.append(item["claim"])
 
     if len(results) == 0:
@@ -188,6 +197,8 @@ Article:
         verdict = "Needs Verification"
     else:
         verdict = "Potentially Misleading"
+    print("\nUNSUPPORTED CLAIMS:")
+print(unsupported_claims)
 
     return {
         "score": credibility_score,
@@ -219,7 +230,7 @@ def home():
             <h1>Error Found</h1>
             <pre>{str(e)}</pre>
             """
-
+        print(report)
     return render_template(
         "index.html",
         report=report
