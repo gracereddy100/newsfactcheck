@@ -208,7 +208,14 @@ def home():
 
         article = request.form["article"]
 
-        return "TEST SUCCESS"
+        try:
+            report = analyze_news(article)
+
+        except Exception as e:
+            return f"""
+            <h1>Error Found</h1>
+            <pre>{str(e)}</pre>
+            """
 
     return render_template(
         "index.html",
