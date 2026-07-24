@@ -97,107 +97,16 @@ Reason: short explanation
 
 def analyze_news(news_article):
 
-    response = client.chat.completions.create(
-        model="meta-llama/llama-3.1-8b-instruct",
-        messages=[
-            {
-                "role": "user",
-                "content": f"""
-Extract factual claims from the article.
-
-Return ONLY JSON.
-
-Example:
-["claim1","claim2"]
-
-Article:
-{news_article}
-"""
-            }
-        ]
-    )
-
-    claims_text = response.choices[0].message.content
-
-    json_match = re.findall(r'\[.*?\]', claims_text, re.DOTALL)
-
-    if json_match:
-        cleaned_claims_text = json_match[-1]
-    else:
-        cleaned_claims_text = claims_text
-
-    try:
-        claims = json.loads(cleaned_claims_text)
-    except:
-        claims = []
-
-    results = []
-
-    for claim in claims[:3]:
-
-        verification = verify_claim(claim)
-
-        results.append({
-            "claim": claim,
-            "verification": verification
-        })
-
-    supported = 0
-    unsupported_claims = []
-    report_text = ""
-
-    for item in results:
-
-        report_text += f"\nClaim: {item['claim']}\n"
-        report_text += item["verification"]
-        report_text += "\n\n"
-
-        text = item["verification"].lower()
-
-        if "status: supported" in text:
-            supported += 1
-
-        if (
-            "unsupported" in text
-            or "partially supported" in text
-            or "partially-supported" in text
-            or "not supported" in text
-        ):
-            unsupported_claims.append(item["claim"])
-
-    if len(results) == 0:
-        return {
-            "score": 0,
-            "verdict": "No Claims Found",
-            "verified": 0,
-            "unsupported": 0,
-            "claims": [],
-            "report": "No factual claims found."
-        }
-
-    credibility_score = round(
-        (supported / len(results)) * 100,
-        2
-    )
-
-    if credibility_score >= 80:
-        verdict = "Highly Credible"
-    elif credibility_score >= 60:
-        verdict = "Mostly Reliable"
-    elif credibility_score >= 40:
-        verdict = "Needs Verification"
-    else:
-        verdict = "Potentially Misleading"
-
     return {
-        "score": credibility_score,
-        "verdict": verdict,
-        "verified": supported,
-        "unsupported": len(unsupported_claims),
-        "claims": unsupported_claims,
-        "report": report_text
+        "score": 100,
+        "verdict": "TEST",
+        "verified": 1,
+        "unsupported": 0,
+        "claims": [],
+        "report": "TEST SUCCESS"
     }
 
+    # rest of your code below
 
 @app.route("/", methods=["GET", "POST"])
 def home():
