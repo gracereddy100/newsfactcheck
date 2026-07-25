@@ -141,12 +141,11 @@ Article:
             "claim": claim,
             "verification": verification
         })
+supported = 0
+unsupported_claims = []
+report_text = ""
 
-    supported = 0
-    unsupported_claims = []
-    report_text = ""
-
-    for item in results:
+for item in results:
 
     report_text += f"\nClaim: {item['claim']}\n"
     report_text += item["verification"]
@@ -198,7 +197,7 @@ Article:
     else:
         verdict = "Potentially Misleading"
     print("\nUNSUPPORTED CLAIMS:")
-print(unsupported_claims)
+    print(unsupported_claims)
 
     return {
         "score": credibility_score,
