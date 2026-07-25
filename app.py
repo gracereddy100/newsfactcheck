@@ -141,37 +141,37 @@ Article:
             "claim": claim,
             "verification": verification
         })
-supported = 0
-unsupported_claims = []
-report_text = ""
+    supported = 0
+    unsupported_claims = []
+    report_text = ""
 
-for item in results:
+    for item in results:
 
-    report_text += f"\nClaim: {item['claim']}\n"
-    report_text += item["verification"]
-    report_text += "\n\n"
+        report_text += f"\nClaim: {item['claim']}\n"
+        report_text += item["verification"]
+        report_text += "\n\n"
 
-    print("\nCLAIM:", item["claim"])
-    print(item["verification"])
+        print("\nCLAIM:", item["claim"])
+        print(item["verification"])
 
-    text = item["verification"].lower()
+        text = item["verification"].lower()
 
-    status_match = re.search(
-        r"status\s*:\s*(supported|partially supported|unsupported)",
-        text
-    )
+        status_match = re.search(
+            r"status\s*:\s*(supported|partially supported|unsupported)",
+            text
+        )
 
-    if status_match:
+        if status_match:
 
-        status = status_match.group(1)
+            status = status_match.group(1)
 
-        print("Detected Status:", status)
+            print("Detected Status:", status)
 
-        if status == "supported":
-            supported += 1
+            if status == "supported":
+                supported += 1
 
-        if status in ["unsupported", "partially supported"]:
-            unsupported_claims.append(item["claim"])
+            if status in ["unsupported", "partially supported"]:
+                unsupported_claims.append(item["claim"])
 
     if len(results) == 0:
         return {
